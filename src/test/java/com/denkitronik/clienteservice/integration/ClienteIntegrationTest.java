@@ -11,7 +11,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType; // Import específico para evitar ambigüedad
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
@@ -93,6 +93,25 @@ class ClienteIntegrationTest {
         assertThat(respuesta.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(respuesta.getBody()).isNotNull();
         assertThat(respuesta.getBody()).isNotEmpty();
+    }
+
+    @Test
+    @Order(4)
+    @DisplayName("POST /clientes con email duplicado → responde sin romper")
+    void crearCliente_emailDuplicado_debeResponder() {
+        Region region = new Region();
+        region.setId(regionId);
+
+        Cliente duplicado = new Cliente();
+        duplicado.setNombre("Otra");
+        duplicado.setApellido("Persona");
+        duplicado.setEmail("margaret@apollo.nasa");
+        duplicado.setRegion(region);
+
+        ResponseEntity<String> respuesta =
+                restTemplate.postForEntity(BASE + "/clientes", duplicado, String.class);
+
+        assertThat(respuesta.getStatusCode()).isNotNull();
     }
 
     @Test

@@ -11,7 +11,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
-
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -31,7 +30,7 @@ class ClienteRestControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @MockitoBean // Reemplaza el bean en el contexto de Spring
+    @MockitoBean
     private IClienteService clienteService;
 
     @Autowired
@@ -109,7 +108,7 @@ class ClienteRestControllerTest {
     @Test
     @DisplayName("POST /clientes con nombre vacío → 400 con lista de errores")
     void crearCliente_nombreVacio_debeRetornar400() throws Exception {
-        cliente.setNombre(""); // Viola @NotEmpty
+        cliente.setNombre("");
 
         mockMvc.perform(post(BASE + "/clientes")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -123,7 +122,7 @@ class ClienteRestControllerTest {
     @Test
     @DisplayName("POST /clientes con email inválido → 400")
     void crearCliente_emailInvalido_debeRetornar400() throws Exception {
-        cliente.setEmail("esto-no-es-un-email"); // Viola @Email
+        cliente.setEmail("esto-no-es-un-email");
 
         mockMvc.perform(post(BASE + "/clientes")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -180,4 +179,10 @@ class ClienteRestControllerTest {
                 .andExpect(status().isNotFound());
     }
 
+    @Test
+    @DisplayName("DELETE /clientes sin ID → error del servidor")
+    void eliminarCliente_sinId_debeRetornarError() throws Exception {
+        mockMvc.perform(delete(BASE + "/clientes"))
+                .andExpect(status().is5xxServerError());
+    }
 }
